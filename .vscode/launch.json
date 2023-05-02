@@ -27,7 +27,7 @@
           "ignoreFailures": true
         }
       ],
-      "preLaunchTask": "Build",
+      "preLaunchTask": "Build C++",
       "miDebuggerPath": "/usr/bin/gdb"
     },
     {
@@ -53,7 +53,7 @@
           "ignoreFailures": true
         }
       ],
-      "preLaunchTask": "Build",
+      "preLaunchTask": "Build C++",
       "miDebuggerPath": "/usr/bin/gdb"
     },
     {
@@ -79,7 +79,7 @@
           "ignoreFailures": true
         }
       ],
-      "preLaunchTask": "Build",
+      "preLaunchTask": "Build C",
       "miDebuggerPath": "/usr/bin/gdb"
     },
     {
@@ -105,7 +105,7 @@
           "ignoreFailures": true
         }
       ],
-      "preLaunchTask": "Build",
+      "preLaunchTask": "Build C",
       "miDebuggerPath": "/usr/bin/gdb"
     },
   ]

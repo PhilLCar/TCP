@@ -1,5 +1,5 @@
 /* Author: Philippe Caron (philippe-caron@hotmail.com)
- * Date: 16 Mar 2022
+ * Date: 06 Jun 2022
  * Description: Very simple UDP client for C.
  */
 
@@ -12,8 +12,7 @@
 extern "C" {
 #endif
 
-UDPServer *udpcopen(const char *address, const unsigned short port, FILE *messages, FILE *errors);
-UDPServer *udpiopen(const unsigned short oport, const unsigned short iport, FILE *message, FILE *errors);
+TCPConnection *tcpconnect(const char *address, const unsigned short port, FILE *messages, FILE *errors);
 
 #ifdef __cplusplus
 }

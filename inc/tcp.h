@@ -3,10 +3,10 @@
  * Description: Very simple UDP library for C.
  */
 
-#ifndef UDP_H
-#define UDP_H
+#ifndef TCP_H
+#define TCP_H
 
-#include <udpserver.h>
-#include <udpclient.h>
+#include <tcpserver.h>
+#include <tcpclient.h>
 
 #endif

@@ -1,62 +1,19 @@
-CC     = gcc
-CXX    = g++
-CFLAGS = -Iinc -Icommon/inc -Iclient/inc -Iserver/inc -Wall -pthread
+# The following variables need to be set prior to including library.mk
 
-LIBRARIES = lib/
-BINARIES  = bin/
-OBJECTS   = obj/
-SRC       = common/src/common client/src/udpclient server/src/udpserver
+# Library name
+NAME = tcp
 
-ifeq "$(LANG)" "C++"
-	CMP      = $(CXX)
-	MAIN     = test/main.cpp
-	LANG_SRC = $(SRC:=.cpp)
-	TARGET   = test_cpp
-	LIB      = libudp++.a
-	OBJ      = *.o
-	PRE      = make X LANG=C
-else
-	CMP      = $(CC)
-	MAIN     = test/main.c
-	LANG_SRC = $(SRC:=.c)
-	TARGET   = test_c
-	LIB      = libudp.a
-	OBJ      = *.c.o
-endif
+# Versioning
+include ver/version.mk
 
-OBJ_LIST  = $(LANG_SRC:=.o)
-COMMAND   = obj
+# If the project is separated among multiple sub-folders
+PROJECT_ROOTS = cli srv com
 
-.PHONY: test clean clean-lib clean-obj clean-bin lib bin obj
+# Additionnal libraries (ex: -pthread, -lmath, etc)
+ADD_LIBRARIES = 
 
-%.cpp.o: %.cpp
-	$(CXX) -c -o $(OBJECTS)$(notdir $@) $< $(CFLAGS)
+# Additionnal flags for the compiler
+ADD_CFLAGS = 
 
-%.c.o: %.c
-	$(CC) -c -o $(OBJECTS)$(notdir $@) $< $(CFLAGS)
-
-$(LIBRARIES)$(LIB):
-	ar rcs $@ $(OBJECTS)$(OBJ)
-
-lib: obj $(LIBRARIES)$(LIB)
-
-clean-bin:
-	rm -f $(BINARIES)$(TARGET)
-
-clean-obj:
-	rm -f $(OBJECTS)$(OBJ)
-
-clean-lib:
-	rm -f $(LIBRARIES)$(LIB)
-
-clean: clean-lib clean-obj clean-bin
-
-obj: $(OBJ_LIST)
-	$(PRE:X=$(COMMAND))
-
-debug:
-	$(eval CFLAGS+=-g)
-	$(eval COMMAND=debug $(COMMAND))
-
-test: debug obj
-	$(CMP) -o $(BINARIES)$(TARGET) $(MAIN) $(OBJECTS)$(OBJ) $(CFLAGS)
+# Include the template
+include $(CUT_HOME)CUT/res/library.mk

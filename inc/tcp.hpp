@@ -3,10 +3,10 @@
  * Description: Very simple UDP library for C++.
  */
 
-#ifndef UDP_HPP
-#define UDP_HPP
+#ifndef TCP_HPP
+#define TCP_HPP
 
-#include <udpserver.hpp>
-#include <udpclient.hpp>
+#include <tcpserver.hpp>
+#include <tcpclient.hpp>
 
 #endif

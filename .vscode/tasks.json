@@ -3,7 +3,26 @@
   "tasks": [
     {
       "type": "shell",
-      "label": "Build",
+      "label": "Build C",
+      "command": "make",
+      "args": [
+        "test"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "detail": "Build C/C++"
+    },
+    {
+      "type": "shell",
+      "label": "Build C++",
       "command": "make",
       "args": [
         "test",
