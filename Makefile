@@ -16,4 +16,4 @@ ADD_LIBRARIES =
 ADD_CFLAGS = 
 
 # Include the template
-include $(CUT_HOME)CUT/res/library.mk
+include library.mk
