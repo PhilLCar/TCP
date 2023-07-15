@@ -3,7 +3,7 @@
  * Description: Common structures for C.
  */
 
-#include <common.h>
+#include <tcpcommon.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@ void tcprecv(TCPConnection *connection, TCPRecvCallback callback) {
 }
 
 int tcpsend(TCPConnection *connection, const unsigned char *bytes, size_t length) {
-  return send(connection->fd, bytes, length, 0) >= 0;
+  return send(connection->fd, bytes, length, 0);
 }
 
 void tcpover(TCPConnection *connection) {

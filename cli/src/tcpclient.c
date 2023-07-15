@@ -40,7 +40,7 @@ TCPConnection *tcpconnect(const char *address, const unsigned short port, FILE *
 
   addr.sin_family      = AF_INET;
   addr.sin_port        = htons(port);
-  addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+  addr.sin_addr.s_addr = inet_addr(address);
 
   if ((socket_fd = _tcpconnect(&addr, messages, errors))) {
     connection           = malloc(sizeof(TCPConnection));

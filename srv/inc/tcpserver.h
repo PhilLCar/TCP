@@ -6,7 +6,7 @@
 #ifndef TCPSERVER_H
 #define TCPSERVER_H
 
-#include <common.h>
+#include <tcpcommon.h>
 
 #ifdef __cplusplus
 extern "C" {

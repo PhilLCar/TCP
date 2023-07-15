@@ -3,35 +3,52 @@
  * Description: Very simple UDP server for C++.
  */
 
-#include <udpserver.hpp>
-#include <udpserver.h>
+#include <tcpserver.hpp>
+#include <tcpserver.h>
 
 #include <cstring>
 
-namespace UDP
+namespace TCP
 {
   Server::Server(const unsigned short port, const void* env)
     : Common(port, env)
+    , server(tcpopen(port, messages, errors))
+    , connections{NULL}
   {
-    server = udpsopen(port, messages, errors);
     server->env = this;
   }
 
-  bool Server::send(const IPV4Address& client, const unsigned char* bytes, size_t length) {
-    server->addr_out.sin_addr.s_addr = htonl(client.address_int());
-    server->addr_out.sin_port        = htons(client.port());
-    return udpsend(server, bytes, length) == 1;
+  Server::~Server()
+  {
+    tcpclose(server);
+    for (int i = 0; i < TCP_MAX_CONN; i++)
+    {
+      if (connections[i]) delete connections[i];
+    }
   }
 
-  bool Server::send(const IPV4Address& client, const std::string& message) {
-    server->addr_out.sin_addr.s_addr = htonl(client.address_int());
-    server->addr_out.sin_port        = htons(client.port());
-    return udpsend(server, (unsigned char*)message.c_str(), message.length()) == 1;
+  void Server::start()
+  {
+    tcpaccept(server, accept);
   }
 
-  bool Server::send (const IPV4Address& client, const char* message) {
-    server->addr_out.sin_addr.s_addr = htonl(client.address_int());
-    server->addr_out.sin_port        = htons(client.port());
-    return udpsend(server, (unsigned char*)message, std::strlen(message)) == 1;
+  void Server::stop()
+  {
+    tcpcancel(server);
+  }
+
+  const Connection& Server::getConnection(int ID)
+  {
+    return *connections[ID];
+  }
+
+  void Server::accept(TCPServer* server, int clientID)
+  {
+    Server* this_server = (Server*)server->env;
+
+    if (this_server->connections[clientID])  delete this_server->connections[clientID];
+    this_server->connections[clientID] = new Connection(server->connections[clientID], this_server->env);
+
+    this_server->onConnect.trigger(*this_server->connections[clientID]);
   }
 }

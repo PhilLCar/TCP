@@ -3,14 +3,38 @@
  * Description: Very simple UDP server for C++.
  */
 
-#ifndef UDPSERVER_HPP
-#define UDPSERVER_HPP
+#ifndef TCPSERVER_HPP
+#define TCPSERVER_HPP
 
-#include <common.hpp>
+#include <tcpcommon.hpp>
+#include <tcpconnection.hpp>
 
 #include <string>
 
-namespace UDP {
+namespace TCP {
+  typedef void (*ConnectionCallback)(Connection&);
+
+  class ConnectionEvent {
+    friend class Server;
+
+  public:
+    inline void operator +=(ConnectionCallback callback) {
+      callbacks.push_back(callback);
+    }
+    inline void operator -=(ConnectionCallback callback) {
+      callbacks.erase(std::remove(callbacks.begin(), callbacks.end(), callback), callbacks.end());
+    }
+
+  private:
+    inline void trigger(Connection& connection) {
+      for (auto callback : callbacks) callback(connection);
+    }
+
+  private:
+    std::vector<ConnectionCallback> callbacks;
+  };
+
+
   class Server : public Common {
   public:
     inline Server(const unsigned short port) : Server(port, nullptr) {}
@@ -18,37 +42,28 @@ namespace UDP {
     template <typename T>
     inline Server(const unsigned short port, const T& env) : Server(port, (const void*)&env) {}
 
+    ~Server();
+
   private:
     explicit Server(const unsigned short port, const void* env);
 
   public:
-    bool send(const IPV4Address& client, const unsigned char* bytes, size_t length);
-    bool send(const IPV4Address& client, const std::string& message);
-    bool send(const IPV4Address& client, const char* message);
+    void start();
+    void stop();
 
-    template <typename T>
-    inline bool send(const IPV4Address& client, const T& serialized) {
-      return send(client, (unsigned char*)&serialized, sizeof(T));
-    }
+    // might throw an error if ID doesn't exist
+    const Connection& getConnection(int ID);
 
-    inline bool send(const char* client, const unsigned char* bytes, size_t length) {
-      const IPV4Address addr(client);
-      return send(addr, bytes, length);
-    }
-    bool send(const char* client, const std::string& message) {
-      const IPV4Address addr(client);
-      return send(addr, message);
-    }
-    bool send(const char* client, const char* message) {
-      const IPV4Address addr(client);
-      return send(addr, message);
-    }
+    private:
+      static void accept(TCPServer* server, int clientID);
+    
+    public:
+      ConnectionEvent onConnect;
 
-    template <typename T>
-    inline bool send(const char* client, const T& serialized) {
-      const IPV4Address addr(client);
-      return send(addr, (unsigned char*)&serialized, sizeof(T));
-    }
+    private:
+      TCPServer*  server;
+      // TODO: For now connection wrapper, eventually think about onclose event
+      Connection* connections[TCP_MAX_CONN];
   };
 }
 

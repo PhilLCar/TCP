@@ -3,46 +3,50 @@
  * Description: Very simple UDP client for C++.
  */
 
-#ifndef UDPCLIENT_HPP
-#define UDPCLIENT_HPP
+#ifndef TCPCLIENT_HPP
+#define TCPCLIENT_HPP
 
-#include <common.hpp>
+#include <tcpcommon.hpp>
+#include <tcpconnection.hpp>
 
 #include <string>
 
-namespace UDP {
+using namespace Networking;
+
+namespace TCP {
   class Client : public Common {
   public:
-    inline Client(const unsigned short port, const char* address)
-      : Client(port, port, address, nullptr)
+    inline Client(const IPV4Address address)
+      : Client(address.address_str().c_str(), address.port(), nullptr)
     {}
-    inline Client(const unsigned short oport, const unsigned short iport)
-      : Client(oport, iport, "127.0.0.1", nullptr)
+    inline Client(const unsigned short port)
+      : Client("127.0.0.1", port, nullptr)
+    {}
+    inline Client(const char* address, const unsigned short port)
+      : Client(address, port, nullptr)
     {}
 
     template <typename T>
-    inline Client(const unsigned short port, const char* address, const T& env)
-      : Client(port, port, address, (const void*)&env)
+    inline Client(const IPV4Address address, const T& env)
+      : Client(address.address_str().c_str(), address.port(), (const void*)&env)
     {}
     template <typename T>
-    inline Client(const unsigned short oport, const unsigned short iport, const T& env)
-      : Client(oport, iport, "127.0.0.1", (const void*)&env)
+    inline Client(const unsigned short port, const T& env)
+      : Client("127.0.0.1", port, (const void*)&env)
     {}
-
-    ~Client();
+    template <typename T>
+    inline Client(const char* address, const unsigned short port, const T& env)
+      : Client(address, port, (const void*)&env)
+    {}
 
   private:
-    explicit Client(const unsigned short oport, const unsigned short iport, const char* iaddress, const void* env);
+    explicit Client(const char* iaddress, const unsigned short port, const void* env);
 
   public:
-    bool send(const unsigned char* bytes, size_t length);
-    bool send(const std::string& message);
-    bool send(const char* message);
+    inline Connection& getConnection() { return connection; }
 
-    template <typename T>
-    inline bool send(const T& serialized) {
-      return send((unsigned char*)&serialized, sizeof(T));
-    }
+  private:
+    Connection connection;
   };
 }
 

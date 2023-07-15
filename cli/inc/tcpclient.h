@@ -3,10 +3,10 @@
  * Description: Very simple UDP client for C.
  */
 
-#ifndef UDPCLIENT_H
-#define UDPCLIENT_H
+#ifndef TCPCLIENT_H
+#define TCPCLIENT_H
 
-#include <common.h>
+#include <tcpcommon.h>
 
 #ifdef __cplusplus
 extern "C" {

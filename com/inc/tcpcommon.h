@@ -3,12 +3,13 @@
  * Description: Common structures for C.
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef TCPCOMMON_H
+#define TCPCOMMON_H
 
 #include <stdio.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include <sys/time.h>
 
 // With those settings (128 connections with a buffer of 65536 each), running the server will require to allocate
 // exactly 8Mb of stack space in buffers, which is reasonable given the intention to use this on microcontrollers.

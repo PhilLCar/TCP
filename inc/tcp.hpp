@@ -8,5 +8,6 @@
 
 #include <tcpserver.hpp>
 #include <tcpclient.hpp>
+#include <tcpconnection.hpp>
 
 #endif

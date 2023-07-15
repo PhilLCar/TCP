@@ -72,7 +72,7 @@ void *_tcpaccept(void *vargp) {
       int client = -1;
       for (int i = 0; i < TCP_MAX_CONN; i++) {
         if (!server->connections[i]) {
-          TCPConnection *connection =  malloc(sizeof(TCPConnection*));
+          TCPConnection *connection =  malloc(sizeof(TCPConnection));
           if (connection) {
             connection->messages   = stdout; // default
             connection->errors     = stderr; // default

@@ -3,30 +3,24 @@
   "tasks": [
     {
       "type": "shell",
-      "label": "Build C",
-      "command": "make",
-      "args": [
-        "test"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": [
-        "$gcc"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "detail": "Build C/C++"
-    },
-    {
-      "type": "shell",
       "label": "Build C++",
-      "command": "make",
+      "command": "g++",
       "args": [
-        "test",
-        "LANG=C++"
+        "-L../Networking/lib",
+        "-Llib",
+        "-Iinc",
+        "-Icli/inc",
+        "-Isrv/inc",
+        "-Icom/inc",
+        "-I../Networking/inc",
+        "-g",
+        "tst/main.cpp",
+        "-lnetwork0++",
+        "-ltcp0++",
+        "-ltcp0",
+        "-pthread",
+        "-o",
+        "bin/test_cpp"
       ],
       "options": {
         "cwd": "${workspaceFolder}"

@@ -3,53 +3,83 @@
  * Description: Simple test for C++.
  */
 
-#include <udp.hpp>
+#include <tcp.hpp>
 
 #include <iostream>
 #include <cstring>
+#include <csignal>
+
+using namespace TCP;
 
 struct Env {
-  std::string client;
+  Connection*     connection;
+  pthread_mutex_t connection_mutex;
+  pthread_cond_t  client_connected;
 };
 
-void receiveMessage(UDP::Message &message, Env* env) {
-  std::string m((char*)message.bytes, message.size);
-  std::cout << "From " << message.address.address_str() << 
-                   "(" << message.address.port() << "): " << m << std::endl;
-  env->client = std::to_string(message.address);
+// TODO fix all the const calls
+void connect(Connection& connection)
+{
+  Env& env = connection.getEnv<Env>();
+
+  env.connection = &connection;
+
+  std:: cout << "Client connected! Waking up main thread..." << std::endl;
+  // Wake up the main thread
+  pthread_mutex_lock(&env.connection_mutex);
+  pthread_cond_signal(&env.client_connected);
+  pthread_mutex_unlock(&env.connection_mutex);
+}
+
+void receive(Message message, Env& env)
+{
+  std::cout << "From (" << std::to_string(message.address) << "): " << (const char*)message.bytes << std::endl;
 }
 
 int main(int argc, char* argv[]) {
-  UDP::Common* common;
-  Env env    = { "" };
-  int client = 0;
+  Common* common = NULL;
+  Env     env;
+
+  env.connection_mutex = PTHREAD_MUTEX_INITIALIZER;
+  env.client_connected = PTHREAD_COND_INITIALIZER;
 
   if (argc > 1) {
     if(!std::strcmp(argv[1], "-s")) {
-      common = new UDP::Server(8008, env);
+      Server* server = new Server(8008, env);
+
+      server->onConnect += connect;
+      server->start();
+
+      // Wait for one client to be connected
+      pthread_mutex_lock(&env.connection_mutex);
+      pthread_cond_wait(&env.client_connected, &env.connection_mutex);
+      pthread_mutex_unlock(&env.connection_mutex);
+      std::cout << "Woke up!" << std::endl;
+      common = server;
     } else if (!std::strcmp(argv[1], "-c")) {
-      common = new UDP::Client(8008, 8009, env);
-      client = 1;
+      Client* client = new Client(8008);
+
+      common = client;
+      env.connection = &client->getConnection();
     }
   }
 
-  common->onReceive += (UDP::Callback)receiveMessage;
+  if (common)
+  {
+    std::cout << "Connection established, write your message ('q' to quit):" << std::endl;
+    env.connection->onReceive += (ReceptionCallback)receive;
 
-  common->start();
-  std::cout << common->message() << std::endl;
-  std::cout << "To quit send 'q' string.\n";
-  while (true) {
-    std::string line;
-    std::getline(std::cin, line);
-    if (line == "q") break;
-    if (env.client == "" && !client) {
-      std::cerr << "Cannot send a message because no client has sent anything yet.\n";
-    } else {
-      if (client) ((UDP::Client*)common)->send(line);
-      else        ((UDP::Server*)common)->send(env.client.c_str(), line);
+    while (env.connection)
+    {
+      std::string input;
+      std::cin >> input;
+
+      if (input == "q") break;
+
+      env.connection->send(input);
     }
+
+    delete common;
   }
-  common->stop();
-  delete common;
   return 0;
 }

@@ -44,12 +44,17 @@ int main(int argc, char *argv[]) {
   if (argc > 1) {
     if (!strcmp(argv[1], "-s")) {
       server = tcpopen(cenv.port, stdout, stderr);
-      server->env = &senv;
-      tcpaccept(server, onConnect);
+      if (server) {
+        server->env = &senv;
+        tcpaccept(server, onConnect);
+      }
     } else if (!strcmp(argv[1], "-c")) {
       senv.connection = tcpconnect(cenv.address, cenv.port, stdout, stderr);
-      senv.connection->env = &cenv;
-      tcprecv(senv.connection, onReceive);
+      if (senv.connection)
+      {
+        senv.connection->env = &cenv;
+        tcprecv(senv.connection, onReceive);
+      }
     }
 
     printf("Send 'q' to quit.\n");
